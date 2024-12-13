@@ -55,6 +55,8 @@ contract Verifier is Ownable {
      */
     event ClaimTopicsUpdated(IClaimIssuer indexed trustedIssuer, uint256[] claimTopics);
 
+    constructor() Ownable(msg.sender) {}
+
     modifier onlyVerifiedSender() {
         require(verify(_msgSender()), "sender is not verified");
         _;

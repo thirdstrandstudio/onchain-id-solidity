@@ -2,7 +2,9 @@
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Strings.sol";
 import "@openzeppelin/contracts/utils/cryptography/ECDSA.sol";
+import "@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol";
 import "../factory/IdFactory.sol";
 
 using ECDSA for bytes32;
@@ -29,6 +31,8 @@ error SignatureAlreadyRevoked(bytes signature);
 error SignatureNotRevoked(bytes signature);
 
 contract Gateway is Ownable {
+    using MessageHashUtils for bytes32;
+    
     IdFactory public idFactory;
     mapping(address => bool) public approvedSigners;
     mapping(bytes => bool) public revokedSignatures;
@@ -42,7 +46,7 @@ contract Gateway is Ownable {
      *  @dev Constructor for the ONCHAINID Factory Gateway.
      *  @param idFactoryAddress the address of the factory to operate (the Gateway must be owner of the Factory).
      */
-    constructor(address idFactoryAddress, address[] memory signersToApprove) Ownable() {
+    constructor(address idFactoryAddress, address[] memory signersToApprove) Ownable(msg.sender) {
         if (idFactoryAddress == address(0)) {
             revert ZeroAddress();
         }
